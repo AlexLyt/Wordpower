@@ -1,8 +1,12 @@
 package com.raywenderlich.timefighter
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -36,13 +40,20 @@ class MainActivity : AppCompatActivity() {
         timeLeftTextView = findViewById(R.id.time_left_text_view)
         tapMeButton = findViewById(R.id.tap_me_button)
 
-        tapMeButton.setOnClickListener { incrementScore() }
+
         if (savedInstanceState != null) {
             score = savedInstanceState.getInt(SCORE_KEY)
             timeLeft = savedInstanceState.getInt(TIME_LEFT_KEY)
             restoreGame()
         } else {
             resetGame()
+        }
+
+        tapMeButton.setOnClickListener { v ->
+            val bounceAnimation = AnimationUtils.loadAnimation(this,
+                R.anim.bounce)
+            v.startAnimation(bounceAnimation)
+            incrementScore()
         }
 
     }
@@ -61,6 +72,30 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onDestroy called.")
     }
 
+    // Inflate the menu; this adds items to the action bar if it is present.
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.about_item) {
+            showInfo()
+        }
+        return true
+    }
+
+    private fun showInfo() {
+        val dialogTitle = getString(R.string.about_title,
+            BuildConfig.VERSION_NAME)
+        val dialogMessage = getString(R.string.about_message)
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(dialogTitle)
+        builder.setMessage(dialogMessage)
+        builder.create().show()
+    }
+
     // increment score logic
     private fun incrementScore() {
         if (!gameStarted) {
@@ -71,6 +106,7 @@ class MainActivity : AppCompatActivity() {
         gameScoreTextView.text = newScore
 
     }
+
 
     // reset game logic
     private fun resetGame() {
